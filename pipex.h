@@ -12,17 +12,18 @@
 
 typedef struct s_pipex
 {
-	int		infile;     // Descriptor de archivo para el archivo de entrada
-	int		outfile;    // Descriptor de archivo para el archivo de salida
-	int		pipefd[2];  // Descriptores de archivo para el pipe
-	pid_t	pid1;       // ID del primer proceso hijo
-	pid_t	pid2;       // ID del segundo proceso hijo
-	char	**cmd1;     // Comando y argumentos para el primer proceso
-	char	**cmd2;     // Comando y argumentos para el segundo proceso
-	char	*path1;     // Ruta del ejecutable del primer comando
-	char	*path2;     // Ruta del ejecutable del segundo comando
+	int		infile;
+	int		outfile;
+	int		pipefd[2];
+	pid_t	pid1;
+	pid_t	pid2;
+	char	**cmd1;
+	char	**cmd2;
+	char	*path1;
+	char	*path2;
 }	t_pipex;
 
 int	check_files_for_pipex(char **files);
-
+void	fill_pipex_structure(t_pipex *pipe, char **argv, char **envp);
+void	ft_first_child_process(t_pipex *pipex, char **argv, char **envp);
 #endif
