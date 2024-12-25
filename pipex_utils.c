@@ -25,12 +25,25 @@ int	check_files_for_pipex(char **files)
 	}
 	return (0);
 }
+static char *find_path2(char **path_splited, char *command)
+{
+	while (path_splited[i])
+	{
+		full_path = ft_strjoin(path_splited[i], "/");
+		full_path = ft_strjoin(full_path, command);
+		if (access(full_path, X_OK) == 0)
+			return (full_path);
+		free(full_path);
+		i++;
+	}
+	perror("Comando no encontrado en el PATH");
+	exit(EXIT_FAILURE);
+}
 
 static char	*find_path(char	*command, char **envp)
 {
 	char	*path_str;
 	char	**path_splited;
-	char	*full_path;
 	int		i;
 
 	i = 0;
@@ -44,18 +57,7 @@ static char	*find_path(char	*command, char **envp)
 		exit(EXIT_FAILURE);
 	}
 	path_splited = ft_split(path_str, ":");
-	i = 0;
-	while (path_splited[i])
-	{
-		full_path = ft_strjoin(path_splited[i], "/");
-		full_path = ft_strjoin(full_path, command);
-		if (access(full_path, X_OK) == 0)
-			return (full_path);
-		free(full_path);
-		i++;
-	}
-	perror("Comando no encontrado en el PATH");
-	exit(EXIT_FAILURE);
+	return (find_path2(path_splited, command));
 }
 
 void	fill_pipex_structure(t_pipex *pipe, char **argv, char **envp)
