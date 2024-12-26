@@ -23,7 +23,7 @@ typedef struct s_pipex
 	char	*path2;
 }	t_pipex;
 
+int	main(int argc, char **argv, char **envp);
 int	check_files_for_pipex(char **files);
 void	fill_pipex_structure(t_pipex *pipe, char **argv, char **envp);
-void	ft_first_child_process(t_pipex *pipex, char **argv, char **envp);
 #endif
