@@ -11,53 +11,6 @@
 /* ************************************************************************** */
 #include "pipex.h"
 
-void print_pipex_structure(t_pipex *pipex)
-{
-    int i;
-
-    printf("infile: %d\n", pipex->infile);
-    printf("outfile: %d\n", pipex->outfile);
-    printf("pipefd[0]: %d\n", pipex->pipefd[0]);
-    printf("pipefd[1]: %d\n", pipex->pipefd[1]);
-    printf("pid1: %d\n", pipex->pid1);
-    printf("pid2: %d\n", pipex->pid2);
-
-    printf("cmd1: ");
-    if (pipex->cmd1)
-    {
-        i = 0;
-        while (pipex->cmd1[i])
-        {
-            printf("%s ", pipex->cmd1[i]);
-            i++;
-        }
-    }
-    else
-    {
-        printf("(null)");
-    }
-    printf("\n");
-
-    printf("cmd2: ");
-    if (pipex->cmd2)
-    {
-        i = 0;
-        while (pipex->cmd2[i])
-        {
-            printf("%s ", pipex->cmd2[i]);
-            i++;
-        }
-    }
-    else
-    {
-        printf("(null)");
-    }
-    printf("\n");
-
-    printf("path1: %s\n", pipex->path1 ? pipex->path1 : "(null)");
-    printf("path2: %s\n", pipex->path2 ? pipex->path2 : "(null)");
-}
-
 static void	ft_second_child_process(t_pipex *pipex, char **argv, char **envp)
 {
 	int	fd;
