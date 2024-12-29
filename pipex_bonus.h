@@ -16,13 +16,15 @@ typedef struct s_pipex
 	int		outfile;
 	int		arguments;
 	int		**pipefd;
-	pid_t	*pid;
+	pid_t	*pids;
 	char	***cmds;
 	char	**paths;
 	int		here_doc;
 }	t_pipex;
 
-int	main(int argc, char **argv, char **envp);
-int	check_files_for_pipex_bonus(char **files, int argc);
-void	fill_pipex_structure_bonus(t_pipex *pipe, char **argv, char **envp);
+int		main(int argc, char **argv, char **envp);
+void	fill_pipex_structure_bonus(t_pipex *pipe, char **argv, int argc, char **envp);
+void	ft_here_doc(char *delimiter);
+void	ft_free_pipex(t_pipex *pipex);
+void 	free_split(char **split);
 #endif

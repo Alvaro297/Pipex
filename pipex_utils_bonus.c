@@ -11,20 +11,25 @@
 /* ************************************************************************** */
 #include "pipex_bonus.h"
 
-int	check_files_for_pipex_bonus(char **files, int argc)
+static int	check_files_for_pipex_bonus(t_pipex *pipex, char **argv, int argc)
 {
-	if (access(files[1], R_OK) == -1)
+	if (!pipex->here_doc)
 	{
-		perror("Error al abrir el archivo de entrada");
-		return (-1);
+		if (access(argv[1], R_OK) == -1)
+		{
+			perror("Error al abrir el archivo de entrada");
+			return (-1);
+		}
 	}
-	if (access(files[argc-1], W_OK) == -1 && access(files[argc - 1], F_OK) == 0)
+	if (access(argv[argc - 1], W_OK) == -1
+		&& access(argv[argc - 1], F_OK) == 0)
 	{
 		perror("Error al escribir en el archivo de salida");
 		return (-1);
 	}
 	return (0);
 }
+
 static char *find_path2(char **path_splited, char **command)
 {
 	char	*full_path;
@@ -38,12 +43,15 @@ static char *find_path2(char **path_splited, char **command)
 		full_path = ft_strjoin(temp_path, command[0]);
 		free(temp_path);
 		if (access(full_path, X_OK) == 0)
+		{
+			free_split(path_splited);
 			return (full_path);
+		}
 		free(full_path);
 		i++;
 	}
-	perror("Comando no encontrado en el PATH");
-	exit(EXIT_FAILURE);
+	free_split(path_splited);
+	return (NULL);
 }
 
 static char	*find_path(char	**command, char **envp)
@@ -73,43 +81,42 @@ static char	*find_path(char	**command, char **envp)
 	return (find_path2(path_splited, command));
 }
 
-static void	ft_loc_memory(t_pipex *pipe, char **argv)
+static void	ft_loc_memory(t_pipex *pipex, char **argv, int argc)
 {
 	if (ft_strncmp(argv[1], "here_doc", ft_strlen("here_doc")) == 0)
-		pipe->here_doc = 1;
+		pipex->here_doc = 1;
 	else
-		pipe->here_doc = 0;
-	if (pipe->here_doc == 1)
+		pipex->here_doc = 0;
+	if (pipex->here_doc == 1)
 	{
-		pipex.infile = -1;
-		pipex.outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		pipex->infile = -1;
+		pipex->outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+		pipex->arguments = argc - 4;
 	}
 	else
 	{
-		pipex.infile = open(argv[1], O_RDONLY);
-		pipex.outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		pipex->infile = open(argv[1], O_RDONLY);
+		pipex->outfile = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		pipex->arguments = argc - 3;
 	}
-	if (pipex.infile < 0 || pipex.outfile < 0)
-	{
-		perror("open");
+	if (check_files_for_pipex_bonus(pipex, argv, argc) == -1)
 		exit(EXIT_FAILURE);
-	}
-	pipe->cmds = malloc(sizeof(char **) * pipe->arguments );
-	pipe->paths = malloc(sizeof(char *) * pipe->arguments);
-	pipe->pids = malloc(sizeof(pid_t) * pipe->arguments);
-	pipe->pipefd = malloc(sizeof(int *) * pipe->arguments - 1);
+	pipex->cmds = malloc(sizeof(char **) * pipex->arguments);
+	pipex->paths = malloc(sizeof(char *) * pipex->arguments);
+	pipex->pids = malloc(sizeof(pid_t) * pipex->arguments);
+	pipex->pipefd = malloc(sizeof(int *) * pipex->arguments - 1);
 }
 
-void	fill_pipex_structure_bonus(t_pipex *pipe, char **argv, char **envp)
+void	fill_pipex_structure_bonus(t_pipex *pipex, char **argv, int argc, char **envp)
 {
 	int		i;
 
 	i = 0;
-	ft_loc_memory(pipe, argv);
-	while (i < pipe->arguments - 1)
+	ft_loc_memory(pipex, argv, argc);
+	while (i < pipex->arguments - 1)
 	{
-		pipe->pipefd[i] = malloc(sizeof(int) * 2);
-		if (pipe(pipe->pipefd[i]) == -1)
+		pipex->pipefd[i] = malloc(sizeof(int) * 2);
+		if (pipe(pipex->pipefd[i]) == -1)
 		{
 			perror("pipe");
 			exit(EXIT_FAILURE);
@@ -117,10 +124,13 @@ void	fill_pipex_structure_bonus(t_pipex *pipe, char **argv, char **envp)
 		i++;
 	}
 	i = 0;
-	while (i < pipe->arguments)
+	while (i < pipex->arguments)
 	{
-		pipe->cmds[i] = ft_split(argv[i + 2], ' ');
-		pipe->paths[i] = find_path(pipe->cmds[i], envp);
+		if (pipex->here_doc == 1)
+			pipex->cmds[i] = ft_split(argv[i + 3], ' ');
+		else
+			pipex->cmds[i] = ft_split(argv[i + 2], ' ');
+		pipex->paths[i] = find_path(pipex->cmds[i], envp);
 		i++;
 	}
 }
