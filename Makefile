@@ -22,14 +22,14 @@ $(LIBFT):
 	make -C $(LIBFT_DIR)
 
 clean:
-	$(RM) $(OBJS)
+	$(RM) $(OBJS) $(BONUS_OBJS)
 	make -C $(LIBFT_DIR) clean
 
 fclean: clean
-	$(RM) $(NAME)
+	$(RM) $(NAME) $(BONUS_NAME)
 	make -C $(LIBFT_DIR) fclean
 
-bonus: $(BONUS_NAME)
+bonus: all $(BONUS_NAME)
 
 re: fclean all
 
