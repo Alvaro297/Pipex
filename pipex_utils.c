@@ -57,7 +57,7 @@ static char	*find_path(char	**command, char **envp)
 	path_splited = NULL;
 	while (envp[i])
 	{
-		if (strncmp(envp[i], "PATH=", 5) == 0)
+		if (ft_strncmp(envp[i], "PATH=", 5) == 0)
 		{
 			path_str = envp[i] + 5;
 			break;
