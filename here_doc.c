@@ -25,15 +25,13 @@ static int	get_next_line(char **line)
 	if (!buffer)
 		return (-1);
 	line_int = read(0, &c, 1);
-	while (line_int && c != '\n' && c != '\0')
+	while (line_int && c != '\0')
 	{
-		if (c != '\n' && c != '\0')
-			buffer[i] = c;
+		buffer[i] = c;
 		i++;
 		line_int = read(0, &c, 1);
 	}
-	buffer[i] = '\n';
-	buffer[++i] = '\0';
+	buffer[i] = '\0';
 	*line = buffer;
 	return (line_int);
 }
